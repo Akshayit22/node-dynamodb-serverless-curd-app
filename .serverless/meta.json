@@ -4,12 +4,45 @@
     "servicePath": "/Users/akshaytelang/Documents/Serverless/sample_project/node-dynamodb-serverless-curd-app/serverless.yml",
     "serviceConfigFileName": "serverless.yml",
     "service": {
-      "service": "dynamodb-crud-api",
+      "app": "dynamodb-serverless-curd-app",
+      "service": "dynamodb-serverless-curd-app",
+      "stages": {
+        "default": {
+          "params": {
+            "tableName": "posts-table-dev"
+          }
+        }
+      },
       "provider": {
         "name": "aws",
-        "runtime": "nodejs14.x",
-        "stage": "dev",
+        "runtime": "nodejs20.x",
         "region": "us-east-1",
+        "stage": "dev",
+        "iam": {
+          "role": {
+            "statements": [
+              {
+                "Effect": "Allow",
+                "Action": [
+                  "dynamodb:Query",
+                  "dynamodb:Scan",
+                  "dynamodb:GetItem",
+                  "dynamodb:PutItem",
+                  "dynamodb:UpdateItem",
+                  "dynamodb:DeleteItem"
+                ],
+                "Resource": [
+                  {
+                    "Fn::GetAtt": [
+                      "UsersTable",
+                      "Arn"
+                    ]
+                  }
+                ]
+              }
+            ]
+          }
+        },
         "environment": {
           "DYNAMODB_TABLE_NAME": "posts-table-dev"
         },
@@ -19,149 +52,17 @@
         "postsTableName": "posts-table-dev"
       },
       "plugins": [
-        "serverless-iam-roles-per-function",
         "serverless-offline"
       ],
       "functions": {
-        "getPost": {
-          "handler": "api.getPost",
-          "name": "get-post",
-          "memorySize": 128,
-          "timeout": 5,
+        "api": {
+          "handler": "handler.handler",
           "events": [
             {
-              "http": {
-                "path": "post/{postId}",
-                "method": "GET"
-              }
+              "httpApi": "*"
             }
           ],
-          "iamRoleStatements": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:GetItem"
-              ],
-              "Resource": {
-                "Fn::GetAtt": [
-                  "PostsTable",
-                  "Arn"
-                ]
-              }
-            }
-          ]
-        },
-        "createPost": {
-          "handler": "api.createPost",
-          "name": "create-post",
-          "memorySize": 128,
-          "timeout": 5,
-          "events": [
-            {
-              "http": {
-                "path": "post",
-                "method": "POST"
-              }
-            }
-          ],
-          "iamRoleStatements": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:PutItem"
-              ],
-              "Resource": {
-                "Fn::GetAtt": [
-                  "PostsTable",
-                  "Arn"
-                ]
-              }
-            }
-          ]
-        },
-        "updatePost": {
-          "handler": "api.updatePost",
-          "name": "update-post",
-          "memorySize": 128,
-          "timeout": 5,
-          "events": [
-            {
-              "http": {
-                "path": "post/{postId}",
-                "method": "PUT"
-              }
-            }
-          ],
-          "iamRoleStatements": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:UpdateItem"
-              ],
-              "Resource": {
-                "Fn::GetAtt": [
-                  "PostsTable",
-                  "Arn"
-                ]
-              }
-            }
-          ]
-        },
-        "deletePost": {
-          "handler": "api.deletePost",
-          "name": "delete-post",
-          "memorySize": 128,
-          "timeout": 5,
-          "events": [
-            {
-              "http": {
-                "path": "post/{postId}",
-                "method": "DELETE"
-              }
-            }
-          ],
-          "iamRoleStatements": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:DeleteItem"
-              ],
-              "Resource": {
-                "Fn::GetAtt": [
-                  "PostsTable",
-                  "Arn"
-                ]
-              }
-            }
-          ]
-        },
-        "getAllPosts": {
-          "handler": "api.getAllPosts",
-          "name": "get-all-posts",
-          "memorySize": 128,
-          "timeout": 5,
-          "events": [
-            {
-              "http": {
-                "path": "posts",
-                "method": "GET"
-              }
-            }
-          ],
-          "iamRoleStatements": [
-            {
-              "Effect": "Allow",
-              "Action": [
-                "dynamodb:Scan"
-              ],
-              "Resource": {
-                "Fn::GetAtt": [
-                  "PostsTable",
-                  "Arn"
-                ]
-              }
-            }
-          ]
+          "name": "dynamodb-serverless-curd-app-dev-api"
         }
       },
       "resources": {
@@ -193,9 +94,34 @@
     },
     "provider": {
       "name": "aws",
-      "runtime": "nodejs14.x",
-      "stage": "dev",
+      "runtime": "nodejs20.x",
       "region": "us-east-1",
+      "stage": "dev",
+      "iam": {
+        "role": {
+          "statements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Query",
+                "dynamodb:Scan",
+                "dynamodb:GetItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem"
+              ],
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "UsersTable",
+                    "Arn"
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      },
       "environment": {
         "DYNAMODB_TABLE_NAME": "posts-table-dev"
       },
@@ -210,13 +136,9 @@
       "serviceProvider": null,
       "instanceParameters": null
     },
-    "error": {
-      "message": "Access denied when storing the parameter \"/serverless-framework/deployment/s3-bucket\". Please check your permissions and try again. You have the following options:\n• Ensure you have permission to create SSM and S3 resources.\n• Use the \"provider.deploymentBucket\" field to specify an existing S3 bucket.\n• Manually create the S3 bucket and SSM parameter.\n\nFor more details, please refer to the documentation: https://www.serverless.com/framework/docs/guides/deployment-bucket\n\nOriginal error: An error occurred while fetching the SSM parameter \"/serverless-framework/deployment/s3-bucket\": User: arn:aws:iam::590852515231:user/atelang is not authorized to perform: ssm:GetParameter on resource: arn:aws:ssm:us-east-1:590852515231:parameter/serverless-framework/deployment/s3-bucket because no identity-based policy allows the ssm:GetParameter action",
-      "code": "DEPLOYMENT_BUCKET_INSUFFICIENT_PERMISSIONS"
-    },
-    "serviceRawFile": "service: dynamodb-crud-api\n\nprovider:\n  name: aws\n  runtime: nodejs14.x\n  stage: dev\n  region: us-east-1\n  environment:\n    DYNAMODB_TABLE_NAME: ${self:custom.postsTableName}\n\ncustom:\n  postsTableName: posts-table-${self:provider.stage}\n\nplugins:\n  - serverless-iam-roles-per-function\n  - serverless-offline\n\nfunctions:\n  getPost:\n    handler: api.getPost\n    name: get-post\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: post/{postId}\n          method: GET\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:GetItem\"\n        Resource: !GetAtt PostsTable.Arn\n  createPost:\n    handler: api.createPost\n    name: create-post\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: post\n          method: POST\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:PutItem\"\n        Resource: !GetAtt PostsTable.Arn\n  updatePost:\n    handler: api.updatePost\n    name: update-post\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: post/{postId}\n          method: PUT\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:UpdateItem\"\n        Resource: !GetAtt PostsTable.Arn\n  deletePost:\n    handler: api.deletePost\n    name: delete-post\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: post/{postId}\n          method: DELETE\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:DeleteItem\"\n        Resource: !GetAtt PostsTable.Arn\n  getAllPosts:\n    handler: api.getAllPosts\n    name: get-all-posts\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: posts\n          method: GET\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:Scan\"\n        Resource: !GetAtt PostsTable.Arn\n\n\n\nresources:\n  Resources:\n    PostsTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:custom.postsTableName}\n        AttributeDefinitions:\n          - AttributeName: postId\n            AttributeType: S\n        KeySchema:\n          - AttributeName: postId\n            KeyType: HASH\n        ProvisionedThroughput:\n          ReadCapacityUnits: 1\n          WriteCapacityUnits: 1",
+    "serviceRawFile": "app: dynamodb-serverless-curd-app\n# \"service\" is the name of this project. This will also be added to your AWS resource names.\nservice: dynamodb-serverless-curd-app\n\nstages:\n  default:\n    params:\n      tableName: \"posts-table-${sls:stage}\"\n\nprovider:\n  name: aws\n  runtime: nodejs20.x\n  region: us-east-1\n  stage: dev\n  iam:\n    role:\n      statements:\n        - Effect: Allow\n          Action:\n            - dynamodb:Query\n            - dynamodb:Scan\n            - dynamodb:GetItem\n            - dynamodb:PutItem\n            - dynamodb:UpdateItem\n            - dynamodb:DeleteItem\n          Resource:\n            - Fn::GetAtt: [UsersTable, Arn]\n  environment:\n        DYNAMODB_TABLE_NAME: ${self:custom.postsTableName}\n\ncustom:\n  postsTableName: posts-table-${self:provider.stage}\n\n\nplugins:\n  - serverless-offline\n\nfunctions:\n  api:\n    handler: handler.handler\n    events:\n      - httpApi: \"*\"\n\nresources:\n  Resources:\n    PostsTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:custom.postsTableName}\n        AttributeDefinitions:\n          - AttributeName: postId\n            AttributeType: S\n        KeySchema:\n          - AttributeName: postId\n            KeyType: HASH\n        ProvisionedThroughput:\n          ReadCapacityUnits: 1\n          WriteCapacityUnits: 1\n",
     "command": [
-      "deploy"
+      "remove"
     ],
     "options": {},
     "orgId": "aedd4626-3b98-466b-8235-ba255b61aca3",
@@ -224,10 +146,35 @@
     "userId": "5k6PDhh9kgcy8bY8XJ",
     "userName": "akshayt",
     "serviceProviderAwsAccountId": "590852515231",
-    "serviceProviderAwsCfStackId": null,
-    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackName": "dynamodb-serverless-curd-app-dev",
+    "serviceProviderAwsCfStackId": "arn:aws:cloudformation:us-east-1:590852515231:stack/dynamodb-serverless-curd-app-dev/50ab4af0-f4f6-11ef-8205-1298649df363",
+    "serviceProviderAwsCfStackCreated": "2025-02-27T10:33:42.566Z",
     "serviceProviderAwsCfStackUpdated": null,
-    "serviceProviderAwsCfStackStatus": null,
-    "serviceProviderAwsCfStackOutputs": null
+    "serviceProviderAwsCfStackStatus": "CREATE_COMPLETE",
+    "serviceProviderAwsCfStackOutputs": [
+      {
+        "OutputKey": "ApiLambdaFunctionQualifiedArn",
+        "OutputValue": "arn:aws:lambda:us-east-1:590852515231:function:dynamodb-serverless-curd-app-dev-api:1",
+        "Description": "Current Lambda function version",
+        "ExportName": "sls-dynamodb-serverless-curd-app-dev-ApiLambdaFunctionQualifiedArn"
+      },
+      {
+        "OutputKey": "HttpApiId",
+        "OutputValue": "yifq7vsq2a",
+        "Description": "Id of the HTTP API",
+        "ExportName": "sls-dynamodb-serverless-curd-app-dev-HttpApiId"
+      },
+      {
+        "OutputKey": "ServerlessDeploymentBucketName",
+        "OutputValue": "serverless-framework-deployments-us-east-1-bbeb5a44-2683",
+        "ExportName": "sls-dynamodb-serverless-curd-app-dev-ServerlessDeploymentBucketName"
+      },
+      {
+        "OutputKey": "HttpApiUrl",
+        "OutputValue": "https://yifq7vsq2a.execute-api.us-east-1.amazonaws.com",
+        "Description": "URL of the HTTP API",
+        "ExportName": "sls-dynamodb-serverless-curd-app-dev-HttpApiUrl"
+      }
+    ]
   }
 }

@@ -1,0 +1,233 @@
+{
+  "/Users/akshaytelang/Documents/Serverless/sample_project/node-dynamodb-serverless-curd-app/serverless.yml": {
+    "versionFramework": "4.7.0",
+    "servicePath": "/Users/akshaytelang/Documents/Serverless/sample_project/node-dynamodb-serverless-curd-app/serverless.yml",
+    "serviceConfigFileName": "serverless.yml",
+    "service": {
+      "service": "dynamodb-crud-api",
+      "provider": {
+        "name": "aws",
+        "runtime": "nodejs14.x",
+        "stage": "dev",
+        "region": "us-east-1",
+        "environment": {
+          "DYNAMODB_TABLE_NAME": "posts-table-dev"
+        },
+        "versionFunctions": true
+      },
+      "custom": {
+        "postsTableName": "posts-table-dev"
+      },
+      "plugins": [
+        "serverless-iam-roles-per-function",
+        "serverless-offline"
+      ],
+      "functions": {
+        "getPost": {
+          "handler": "api.getPost",
+          "name": "get-post",
+          "memorySize": 128,
+          "timeout": 5,
+          "events": [
+            {
+              "http": {
+                "path": "post/{postId}",
+                "method": "GET"
+              }
+            }
+          ],
+          "iamRoleStatements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem"
+              ],
+              "Resource": {
+                "Fn::GetAtt": [
+                  "PostsTable",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        },
+        "createPost": {
+          "handler": "api.createPost",
+          "name": "create-post",
+          "memorySize": 128,
+          "timeout": 5,
+          "events": [
+            {
+              "http": {
+                "path": "post",
+                "method": "POST"
+              }
+            }
+          ],
+          "iamRoleStatements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:PutItem"
+              ],
+              "Resource": {
+                "Fn::GetAtt": [
+                  "PostsTable",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        },
+        "updatePost": {
+          "handler": "api.updatePost",
+          "name": "update-post",
+          "memorySize": 128,
+          "timeout": 5,
+          "events": [
+            {
+              "http": {
+                "path": "post/{postId}",
+                "method": "PUT"
+              }
+            }
+          ],
+          "iamRoleStatements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:UpdateItem"
+              ],
+              "Resource": {
+                "Fn::GetAtt": [
+                  "PostsTable",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        },
+        "deletePost": {
+          "handler": "api.deletePost",
+          "name": "delete-post",
+          "memorySize": 128,
+          "timeout": 5,
+          "events": [
+            {
+              "http": {
+                "path": "post/{postId}",
+                "method": "DELETE"
+              }
+            }
+          ],
+          "iamRoleStatements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:DeleteItem"
+              ],
+              "Resource": {
+                "Fn::GetAtt": [
+                  "PostsTable",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        },
+        "getAllPosts": {
+          "handler": "api.getAllPosts",
+          "name": "get-all-posts",
+          "memorySize": 128,
+          "timeout": 5,
+          "events": [
+            {
+              "http": {
+                "path": "posts",
+                "method": "GET"
+              }
+            }
+          ],
+          "iamRoleStatements": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:Scan"
+              ],
+              "Resource": {
+                "Fn::GetAtt": [
+                  "PostsTable",
+                  "Arn"
+                ]
+              }
+            }
+          ]
+        }
+      },
+      "resources": {
+        "Resources": {
+          "PostsTable": {
+            "Type": "AWS::DynamoDB::Table",
+            "Properties": {
+              "TableName": "posts-table-dev",
+              "AttributeDefinitions": [
+                {
+                  "AttributeName": "postId",
+                  "AttributeType": "S"
+                }
+              ],
+              "KeySchema": [
+                {
+                  "AttributeName": "postId",
+                  "KeyType": "HASH"
+                }
+              ],
+              "ProvisionedThroughput": {
+                "ReadCapacityUnits": 1,
+                "WriteCapacityUnits": 1
+              }
+            }
+          }
+        }
+      }
+    },
+    "provider": {
+      "name": "aws",
+      "runtime": "nodejs14.x",
+      "stage": "dev",
+      "region": "us-east-1",
+      "environment": {
+        "DYNAMODB_TABLE_NAME": "posts-table-dev"
+      },
+      "versionFunctions": true
+    },
+    "dashboard": {
+      "isEnabledForService": false,
+      "requiredAuthentication": false,
+      "orgFeaturesInUse": null,
+      "orgObservabilityIntegrations": null,
+      "serviceAppId": null,
+      "serviceProvider": null,
+      "instanceParameters": null
+    },
+    "error": {
+      "message": "Access denied when storing the parameter \"/serverless-framework/deployment/s3-bucket\". Please check your permissions and try again. You have the following options:\n• Ensure you have permission to create SSM and S3 resources.\n• Use the \"provider.deploymentBucket\" field to specify an existing S3 bucket.\n• Manually create the S3 bucket and SSM parameter.\n\nFor more details, please refer to the documentation: https://www.serverless.com/framework/docs/guides/deployment-bucket\n\nOriginal error: An error occurred while fetching the SSM parameter \"/serverless-framework/deployment/s3-bucket\": User: arn:aws:iam::590852515231:user/atelang is not authorized to perform: ssm:GetParameter on resource: arn:aws:ssm:us-east-1:590852515231:parameter/serverless-framework/deployment/s3-bucket because no identity-based policy allows the ssm:GetParameter action",
+      "code": "DEPLOYMENT_BUCKET_INSUFFICIENT_PERMISSIONS"
+    },
+    "serviceRawFile": "service: dynamodb-crud-api\n\nprovider:\n  name: aws\n  runtime: nodejs14.x\n  stage: dev\n  region: us-east-1\n  environment:\n    DYNAMODB_TABLE_NAME: ${self:custom.postsTableName}\n\ncustom:\n  postsTableName: posts-table-${self:provider.stage}\n\nplugins:\n  - serverless-iam-roles-per-function\n  - serverless-offline\n\nfunctions:\n  getPost:\n    handler: api.getPost\n    name: get-post\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: post/{postId}\n          method: GET\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:GetItem\"\n        Resource: !GetAtt PostsTable.Arn\n  createPost:\n    handler: api.createPost\n    name: create-post\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: post\n          method: POST\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:PutItem\"\n        Resource: !GetAtt PostsTable.Arn\n  updatePost:\n    handler: api.updatePost\n    name: update-post\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: post/{postId}\n          method: PUT\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:UpdateItem\"\n        Resource: !GetAtt PostsTable.Arn\n  deletePost:\n    handler: api.deletePost\n    name: delete-post\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: post/{postId}\n          method: DELETE\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:DeleteItem\"\n        Resource: !GetAtt PostsTable.Arn\n  getAllPosts:\n    handler: api.getAllPosts\n    name: get-all-posts\n    memorySize: 128 # mb\n    timeout: 5 # seconds\n    events:\n      - http:\n          path: posts\n          method: GET\n    iamRoleStatements:\n      - Effect: \"Allow\"\n        Action:\n          - \"dynamodb:Scan\"\n        Resource: !GetAtt PostsTable.Arn\n\n\n\nresources:\n  Resources:\n    PostsTable:\n      Type: AWS::DynamoDB::Table\n      Properties:\n        TableName: ${self:custom.postsTableName}\n        AttributeDefinitions:\n          - AttributeName: postId\n            AttributeType: S\n        KeySchema:\n          - AttributeName: postId\n            KeyType: HASH\n        ProvisionedThroughput:\n          ReadCapacityUnits: 1\n          WriteCapacityUnits: 1",
+    "command": [
+      "deploy"
+    ],
+    "options": {},
+    "orgId": "aedd4626-3b98-466b-8235-ba255b61aca3",
+    "orgName": "akshayt",
+    "userId": "5k6PDhh9kgcy8bY8XJ",
+    "userName": "akshayt",
+    "serviceProviderAwsAccountId": "590852515231",
+    "serviceProviderAwsCfStackId": null,
+    "serviceProviderAwsCfStackCreated": null,
+    "serviceProviderAwsCfStackUpdated": null,
+    "serviceProviderAwsCfStackStatus": null,
+    "serviceProviderAwsCfStackOutputs": null
+  }
+}

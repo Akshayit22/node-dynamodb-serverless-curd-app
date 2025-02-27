@@ -1,5 +1,4 @@
 app: dynamodb-serverless-curd-app
-# "service" is the name of this project. This will also be added to your AWS resource names.
 service: dynamodb-serverless-curd-app
 
 stages:
@@ -24,7 +23,7 @@ provider:
             - dynamodb:UpdateItem
             - dynamodb:DeleteItem
           Resource:
-            - Fn::GetAtt: [UsersTable, Arn]
+            - Fn::GetAtt: [PostsTable, Arn]
   environment:
         DYNAMODB_TABLE_NAME: ${self:custom.postsTableName}
 
